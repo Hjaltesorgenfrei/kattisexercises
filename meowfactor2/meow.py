@@ -34,6 +34,8 @@ if 'meow' == string:
     print(0)
     exit()
 
+minval = damerau_levenshtein_distance(string,'meow')
+"""
 minval = damerau_levenshtein_distance('meow',string[0:4])
 
 for i in range(len(string) - 3):
@@ -45,6 +47,6 @@ for i in range(len(string) - 3):
         break
 
 print(minval)
-
+"""
 end = time.time()
 print(end - start)
