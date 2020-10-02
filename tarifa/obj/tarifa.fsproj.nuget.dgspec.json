@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Code\\kattis\\tarifa\\tarifa.fsproj": {}
+    "d:\\Code\\kattis\\tarifa\\tarifa.fsproj": {}
   },
   "projects": {
-    "D:\\Code\\kattis\\tarifa\\tarifa.fsproj": {
+    "d:\\Code\\kattis\\tarifa\\tarifa.fsproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Code\\kattis\\tarifa\\tarifa.fsproj",
+        "projectUniqueName": "d:\\Code\\kattis\\tarifa\\tarifa.fsproj",
         "projectName": "tarifa",
-        "projectPath": "D:\\Code\\kattis\\tarifa\\tarifa.fsproj",
+        "projectPath": "d:\\Code\\kattis\\tarifa\\tarifa.fsproj",
         "packagesPath": "C:\\Users\\Hjalte\\.nuget\\packages\\",
-        "outputPath": "D:\\Code\\kattis\\tarifa\\obj\\",
+        "outputPath": "d:\\Code\\kattis\\tarifa\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

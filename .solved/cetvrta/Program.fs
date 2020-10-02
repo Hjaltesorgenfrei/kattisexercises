@@ -2,6 +2,8 @@
 
 open System
 
+let f l =  l |> List.toSeq |> Seq.countBy id |> Seq.filter (fun n -> snd n = 1) |> Seq.tryPick (fun n -> Some(fst n))
+
 [<EntryPoint>]
 let main argv =
     
@@ -19,6 +21,8 @@ let main argv =
             ) |> 
         Seq.toList |>
         List.unzip
-    let x1 = x |> Seq.countBy id |> Seq.filter (fun n -> snd n = 1) |> Seq.tryPick (fun n -> Some(fst n))
+    let x1 = f x    
+    printf "%d %d" (f x).Value (f y).Value
+
 
     0  
