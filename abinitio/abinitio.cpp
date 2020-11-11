@@ -47,7 +47,9 @@ void inline transpose() {
             (*adj_matrix_transpose)[a][b] = (*adj_matrix)[b][a];
         }
     }
+    auto tmp = adj_matrix;
     adj_matrix = adj_matrix_transpose;
+    delete tmp;
 }
 
 void inline complement() {
@@ -121,11 +123,10 @@ int main() {
             remove_edge(x, y);
             break;
         case 5:
-            transpose();
+            transpose(); // Needs to change a b, as well as 
             break;
         case 6:
             complement();
-            //Remember to skip a == b
             break;
         }
     }
