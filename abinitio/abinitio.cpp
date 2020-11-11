@@ -9,46 +9,46 @@
 
 using namespace std;
 
-#define MATRIXSIZE 3009
+#define MATRIXSIZE 4096
 
 int v, e, q;
-array<bitset<MATRIXSIZE>, MATRIXSIZE>  adj_matrix; // Make this a pointer if we have problems
+array<bitset<MATRIXSIZE>, MATRIXSIZE>  *adj_matrix; // Make this a pointer if we have problems
 
 void inline init_graph(int vertices) {
     return;
 }
 
 void inline add_edge(int a, int b) {
-    adj_matrix[a][b] = true;
+    (*adj_matrix)[a][b] = true;
 }
 
 void inline add_vertice() {
     for(int i = 0; i < v; i++) {
-        adj_matrix[i][v] = false; // Clean the spot in all arrays, as it might have been set already.
+        (*adj_matrix)[i][v] = false; // Clean the spot in all arrays, as it might have been set already.
     } 
     v++;
 }
 
 void inline remove_all_edges(int a) {
-    adj_matrix[a].reset();
+    (*adj_matrix)[a].reset();
     int i;
     for(i = 0; i < a; i++){
-        adj_matrix[i][a] = false;
+        (*adj_matrix)[i][a] = false;
     }
     for(i = a + 1; i < v; i++){
-        adj_matrix[i][a] = false;
+        (*adj_matrix)[i][a] = false;
     }
 }
 
 void inline remove_edge(int a, int b) {
-    adj_matrix[a][b] = false;
+    (*adj_matrix)[a][b] = false;
 }
 
 void inline transpose() {
-    array<bitset<MATRIXSIZE>, MATRIXSIZE> adj_matrix_transpose;
+    array<bitset<MATRIXSIZE>, MATRIXSIZE>* adj_matrix_transpose;
     for (int a = 0; a < v; a++) {
         for(int b = 0; b< v; b++) {
-            adj_matrix_transpose[a][b] = adj_matrix[b][a];
+            (*adj_matrix_transpose)[a][b] = (*adj_matrix)[b][a];
         }
     }
     adj_matrix = adj_matrix_transpose;
@@ -56,7 +56,7 @@ void inline transpose() {
 
 void inline complement() {
     for(int i = 0; i < v; i++) {
-        adj_matrix[i].flip();
+        (*adj_matrix)[i].flip();
     } 
     return;
 }
@@ -69,8 +69,8 @@ long inline hash_of(int a) {
     long long unsigned result = 0;
     long long unsigned count = 0;
     for(long i = 0; i < v; i++) {
-        if (adj_matrix[a][i]) {
-            result += hash_values[i] * i;
+        if ((*adj_matrix)[a][i]) {
+            result += hash_values[count++] * i;
             result = result % MODULOANSWER;
         }
     }
@@ -80,7 +80,6 @@ long inline hash_of(int a) {
 void inline pre_compute_hash_values(){
     long long unsigned res = 1;
     for (int i = 0; i < v; i++) {
-        cout << res << "\n";
         hash_values[i] = res;
         res = res * 7;
         while(res > MODULOANSWER) res -= MODULOANSWER;
@@ -90,8 +89,8 @@ void inline pre_compute_hash_values(){
 void inline clean_matrix() {
     bitset<MATRIXSIZE> pattern (string(MATRIXSIZE - v, '0') + string(v, '1'));
     for(int i = 0; i < v; i++){
-        adj_matrix[i] &= pattern;
-        adj_matrix[i][i] = false;
+        (*adj_matrix)[i] &= pattern;
+        (*adj_matrix)[i][i] = false;
     }
 }
 
@@ -139,6 +138,6 @@ int main () {
     cout << v << "\n";
     //hash_of(0);
     for(int i = 0; i < v; i++){
-        cout << adj_matrix[i].count() << " " << hash_of(i) << "\n";
+        cout << (*adj_matrix)[i].count() << " " << hash_of(i) << "\n";
     }
 }
