@@ -123,7 +123,7 @@ int main() {
             remove_edge(x, y);
             break;
         case 5:
-            transpose(); // Needs to change a b, as well as 
+            transpose(); // Needs to change a b, as well as complement, so handle 4 different matrixes at the same time.
             break;
         case 6:
             complement();
