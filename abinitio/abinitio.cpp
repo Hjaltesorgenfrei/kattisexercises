@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#define MATRIXSIZE 8
+#define MATRIXSIZE 4096
 
 int v, e, q;
 array<bitset<MATRIXSIZE>, MATRIXSIZE>  adj_matrix; // Make this a pointer if we have problems
@@ -62,10 +62,12 @@ void inline complement() {
 
 long inline hash_of(int a) {
     long long unsigned result = 0;
-    const int c = adj_matrix[a].count();
-    for(long i = 0; i < c; i++) {
-        result += (pow(7, i)) * (i + 1);
-        result = result % MODULOANSWER;
+    long long unsigned count = 0;
+    for(long i = 0; i < v; i++) {
+        if (adj_matrix[a][i]) {
+            result += (powl(7ULL, count++)) * i;
+            result = result % MODULOANSWER;
+        }
     }
     return result % MODULOANSWER;
 }
@@ -117,11 +119,10 @@ int main () {
                 //Remember to skip a == b
                 break;
         }
-        cout << query << " " << adj_matrix[0] << "\n";
     }
     clean_matrix();
-    cout << "size: " << v << "\n";
+    cout << v << "\n";
     for(int i = 0; i < v; i++){
-        cout << adj_matrix[i].count() << " " << hash_of(i) << " " << adj_matrix[i] << "\n";
+        cout << adj_matrix[i].count() << " " << hash_of(i) << "\n";
     }
 }
