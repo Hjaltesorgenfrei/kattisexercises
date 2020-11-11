@@ -3,10 +3,13 @@
 #include <bitset>
 #include <array>
 #include <cmath>
+#include <unordered_map>
+
+
 
 using namespace std;
 
-#define MATRIXSIZE 4096
+#define MATRIXSIZE 3009
 
 int v, e, q;
 array<bitset<MATRIXSIZE>, MATRIXSIZE>  adj_matrix; // Make this a pointer if we have problems
@@ -58,18 +61,30 @@ void inline complement() {
     return;
 }
 
-#define MODULOANSWER 1000000007L
+#define MODULOANSWER 1000000007ULL
+
+unsigned long long hash_values[MATRIXSIZE];
 
 long inline hash_of(int a) {
     long long unsigned result = 0;
     long long unsigned count = 0;
     for(long i = 0; i < v; i++) {
         if (adj_matrix[a][i]) {
-            result += (powl(7ULL, count++)) * i;
+            result += hash_values[i] * i;
             result = result % MODULOANSWER;
         }
     }
     return result % MODULOANSWER;
+}
+
+void inline pre_compute_hash_values(){
+    long long unsigned res = 1;
+    for (int i = 0; i < v; i++) {
+        cout << res << "\n";
+        hash_values[i] = res;
+        res = res * 7;
+        while(res > MODULOANSWER) res -= MODULOANSWER;
+    }
 }
 
 void inline clean_matrix() {
@@ -82,8 +97,7 @@ void inline clean_matrix() {
 
 int main () {
     ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
+    cin.tie(NULL); cout.tie(NULL);
     cin >> v >> e >> q;
     init_graph(v);
     int a, b;
@@ -121,7 +135,9 @@ int main () {
         }
     }
     clean_matrix();
+    pre_compute_hash_values();
     cout << v << "\n";
+    //hash_of(0);
     for(int i = 0; i < v; i++){
         cout << adj_matrix[i].count() << " " << hash_of(i) << "\n";
     }
