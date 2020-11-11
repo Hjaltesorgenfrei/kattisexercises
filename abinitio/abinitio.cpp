@@ -2,14 +2,10 @@
 #include <string>
 #include <bitset>
 #include <array>
-#include <cmath>
-#include <unordered_map>
-
-
 
 using namespace std;
 
-#define MATRIXSIZE 1000
+#define MATRIXSIZE 4096
 
 int v, e, q;
 auto adj_matrix = new array<bitset<MATRIXSIZE>, MATRIXSIZE>; // Make this a pointer if we have problems
@@ -45,7 +41,7 @@ void inline remove_edge(int a, int b) {
 }
 
 void inline transpose() {
-    auto *adj_matrix_transpose = new array<bitset<MATRIXSIZE>, MATRIXSIZE>;
+    auto adj_matrix_transpose = new array<bitset<MATRIXSIZE>, MATRIXSIZE>;
     for (int a = 0; a < v; a++) {
         for (int b = 0; b < v; b++) {
             (*adj_matrix_transpose)[a][b] = (*adj_matrix)[b][a];
