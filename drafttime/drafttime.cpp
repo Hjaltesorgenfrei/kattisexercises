@@ -7,6 +7,7 @@
 #include <string>
 #include <functional>
 #include <deque>
+#include <algorithm>
 
 using namespace std;
 
@@ -35,7 +36,7 @@ vector<Rejecter> rejecters;
 
 bool proposals_left(int proposer_id) {
     auto proposer = proposers[proposer_id];
-    return proposer.proposed_count >= proposer.preferences.size();
+    return proposer.proposed_count < proposer.preferences.size();
 }
 
 void marry(int proposer_id, int rejecter_id) {
@@ -51,8 +52,8 @@ bool preferred(int proposer_id, int rejecter_id) {
 }
 
 bool stable_match() {
-    deque<int> unmatched(proposers.size());
-    for (int i = 0; i < unmatched.size(); i++) {
+    deque<int> unmatched(proposers.size(), 0);
+    for (int i = 0; i < proposers.size(); i++) {
         unmatched[i] = i;
     }
 
@@ -79,19 +80,23 @@ bool stable_match() {
     return unmatched.size() == 0; 
 }
 
+// Problem Specific
+
+int n, m, k;
+
 void debug_print() {
-     cout << "Proposers:\n";
+    cout << "Proposers:\n";
     for (int i = 0; i < n; i++) {
-        cout << i << ": ";
+        cout << i << " (" << proposers[i].partner << "): ";
         for (auto v : proposers[i].preferences) {
             cout << v << " "; 
         }
         cout << "\n";
     }
 
-    cout << "Rejecters:\n";
+    cout << "\nRejecters:\n";
     for (int i = 0; i < k; i++) {
-        cout << i << ": ";
+        cout << i << " (" << rejecters[i].partner << "): ";
         for (auto v : rejecters[i].preferences_values) {
             cout << v << " "; 
         }
@@ -99,17 +104,15 @@ void debug_print() {
     }
 }
 
-// Problem Specific
-
-int n, m, k;
-
 unordered_map<string, int> team_mapping;
 unordered_map<string, int> player_mapping;
 vector<vector<string>> teams_unconverted;
+vector<vector<int>> final_drafts;
 
 int main() {
     cin >> n >> m >> k;
     proposers.resize(n);
+    final_drafts.resize(n);
     rejecters.resize(k);
     string buf;
     teams_unconverted.resize(k);
@@ -135,6 +138,37 @@ int main() {
             proposers[i].preferences.push_back(player_mapping[player]);
         }
     }
+    
+
+    
+    for (int i = 0; i < m; i++) {
+        stable_match();
+        debug_print();
+        unordered_set<int> drafted;
+        for(int j = 0; j < k; j++) {
+            rejecters[j].partner = -1;
+        }
+        for(int j = 0; j < n; j++) {
+            int draft_id = proposers[j].partner;
+            drafted.emplace(draft_id);
+            final_drafts[j].emplace_back(draft_id);
+        }
+        for(auto& team : proposers) {
+            team.partner = -1;
+            team.proposed_count = 0;
+            team.preferences.erase(
+                    remove_if(
+                        team.preferences.begin(), 
+                        team.preferences.end(), 
+                        [drafted](int v) { return drafted.find(v) != drafted.end(); }
+                    ),
+                team.preferences.end()
+                );
+        }
+    }
+    
+
+    
 
     return 0;
 }
