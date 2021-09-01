@@ -12,7 +12,7 @@ using namespace std;
 
 struct Proposer {
     int partner = -1;
-    int proposed_count;
+    int proposed_count = 0;
     
     // Index of preferences in sorted order
     vector<int> preferences;
@@ -79,8 +79,62 @@ bool stable_match() {
     return unmatched.size() == 0; 
 }
 
+void debug_print() {
+     cout << "Proposers:\n";
+    for (int i = 0; i < n; i++) {
+        cout << i << ": ";
+        for (auto v : proposers[i].preferences) {
+            cout << v << " "; 
+        }
+        cout << "\n";
+    }
+
+    cout << "Rejecters:\n";
+    for (int i = 0; i < k; i++) {
+        cout << i << ": ";
+        for (auto v : rejecters[i].preferences_values) {
+            cout << v << " "; 
+        }
+        cout << "\n";
+    }
+}
+
 // Problem Specific
 
-int main() {
+int n, m, k;
 
+unordered_map<string, int> team_mapping;
+unordered_map<string, int> player_mapping;
+vector<vector<string>> teams_unconverted;
+
+int main() {
+    cin >> n >> m >> k;
+    proposers.resize(n);
+    rejecters.resize(k);
+    string buf;
+    teams_unconverted.resize(k);
+    for (int i = 0; i < n; i++) {
+        cin >> buf; 
+        team_mapping[buf] = i;
+        teams_unconverted[i].resize(k);
+        for (int j = 0; j < k; j++) {
+            cin >> teams_unconverted[i][j];
+        }
+    }
+    for (int i = 0; i < k; i++) {
+        cin >> buf; 
+        player_mapping[buf] = i;
+        rejecters[i].preferences_values.resize(n);
+        for (int j = 0; j < n; j++){
+            cin >> buf;
+            rejecters[i].preferences_values[team_mapping[buf]] = j;
+        }
+    }
+    for (int i = 0; i < n; i++) {
+        for (auto player : teams_unconverted[i]) {
+            proposers[i].preferences.push_back(player_mapping[player]);
+        }
+    }
+
+    return 0;
 }
