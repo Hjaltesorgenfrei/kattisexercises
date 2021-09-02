@@ -35,7 +35,7 @@ vector<Proposer> proposers;
 vector<Rejecter> rejecters;
 
 bool proposals_left(int proposer_id) {
-    auto proposer = proposers[proposer_id];
+    auto& proposer = proposers[proposer_id];
     return proposer.proposed_count < proposer.preferences.size();
 }
 
@@ -45,7 +45,7 @@ void marry(int proposer_id, int rejecter_id) {
 }
 
 bool preferred(int proposer_id, int rejecter_id) {
-    auto rejecter = rejecters[rejecter_id];
+    auto& rejecter = rejecters[rejecter_id];
     int proposer_preference = rejecter.preferences_values[proposer_id];
     int old_preference = rejecter.preferences_values[rejecter.partner];
     return proposer_preference < old_preference;
@@ -60,9 +60,9 @@ bool stable_match() {
     while (unmatched.size() && proposals_left(unmatched.front())) {
         int proposer_id = unmatched.front();
         unmatched.pop_front();
-        auto proposer = proposers[proposer_id];
+        auto& proposer = proposers[proposer_id];
         int rejecter_id = proposer.next_proposal();
-        auto rejecter = rejecters[rejecter_id];
+        auto& rejecter = rejecters[rejecter_id];
 
         if (rejecter.partner == -1) { // No Marriage yet
             marry(proposer_id, rejecter_id);
@@ -106,18 +106,23 @@ void debug_print() {
 
 unordered_map<string, int> team_mapping;
 unordered_map<string, int> player_mapping;
+vector<string> team_names;
+vector<string> player_names;
 vector<vector<string>> teams_unconverted;
 vector<vector<int>> final_drafts;
 
 int main() {
     cin >> n >> m >> k;
     proposers.resize(n);
+    team_names.resize(n);
+    player_names.resize(k);
     final_drafts.resize(n);
     rejecters.resize(k);
     string buf;
     teams_unconverted.resize(k);
     for (int i = 0; i < n; i++) {
         cin >> buf; 
+        team_names[i] = buf;
         team_mapping[buf] = i;
         teams_unconverted[i].resize(k);
         for (int j = 0; j < k; j++) {
@@ -126,6 +131,7 @@ int main() {
     }
     for (int i = 0; i < k; i++) {
         cin >> buf; 
+        player_names[i] = buf;
         player_mapping[buf] = i;
         rejecters[i].preferences_values.resize(n);
         for (int j = 0; j < n; j++){
@@ -139,11 +145,8 @@ int main() {
         }
     }
     
-
-    
     for (int i = 0; i < m; i++) {
         stable_match();
-        debug_print();
         unordered_set<int> drafted;
         for(int j = 0; j < k; j++) {
             rejecters[j].partner = -1;
@@ -167,7 +170,14 @@ int main() {
         }
     }
     
-
+    for(int i = 0; i < n; i++) {
+        cout << team_names[i] << " ";
+        for (int j = 0; j < m; j++) {
+            int player = final_drafts[i][j];
+            cout << player_names[player] << (j + 1 == m ? "" : " "); 
+        }
+        cout << "\n";
+    }
     
 
     return 0;
