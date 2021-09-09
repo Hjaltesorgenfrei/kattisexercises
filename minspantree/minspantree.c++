@@ -14,7 +14,7 @@ struct Edge {
     Edge(int _u, int _v, int _w) : u(_u), v(_v), w(_w) {}
     bool operator<(const Edge& rhs) const
     {
-        return w < rhs.w;
+        return w > rhs.w;
     }
 };
 
@@ -27,9 +27,11 @@ long long prim(int s) {
     for (auto& e : g[0]) {
         pq.emplace(e);
     }
-    long long cost;
+    visited[0] = true;
+    long long cost = 0;
     while(!pq.empty()) {
         auto e = pq.top(); pq.pop();
+        if (visited[e.u] && visited[e.v]) continue;
         if(!visited[e.u]) {
             visited[e.u] = true;
             for (auto& edge : g[e.u]) {
