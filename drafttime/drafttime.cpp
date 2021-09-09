@@ -11,8 +11,9 @@
 
 using namespace std;
 
-struct Proposer {
-    int partner = -1;
+int n, m, k;
+
+struct Player {
     int proposed_count = 0;
     
     // Index of preferences in sorted order
@@ -23,85 +24,61 @@ struct Proposer {
     }
 };
 
-struct Rejecter {
-    int partner = -1;
+struct Team {
+    priority_queue<pair<int, int>, vector<pair<int,int>>, greater<pair<int,int>>> partners;
 
     // Rejecters preference of proposers, low value is better.
     // A given index in preference is occupied by that proposer.
     vector<int> preferences_values; 
 };
 
-vector<Proposer> proposers;
-vector<Rejecter> rejecters;
+vector<Player> players;
+vector<Team> teams;
 
 bool proposals_left(int proposer_id) {
-    auto& proposer = proposers[proposer_id];
+    auto& proposer = players[proposer_id];
     return proposer.proposed_count < proposer.preferences.size();
 }
 
-void marry(int proposer_id, int rejecter_id) {
-    rejecters[rejecter_id].partner = proposer_id;
-    proposers[proposer_id].partner = rejecter_id;
+void join(int proposer_id, int rejecter_id) {
+    int pref = teams[rejecter_id].preferences_values[proposer_id];
+    teams[rejecter_id].partners.push(make_pair(pref,proposer_id));
 }
 
 bool preferred(int proposer_id, int rejecter_id) {
-    auto& rejecter = rejecters[rejecter_id];
+    auto& rejecter = teams[rejecter_id];
     int proposer_preference = rejecter.preferences_values[proposer_id];
-    int old_preference = rejecter.preferences_values[rejecter.partner];
+    int old_preference = rejecter.partners.top().first;
     return proposer_preference < old_preference;
 }
 
 bool stable_match() {
-    deque<int> unmatched(proposers.size(), 0);
-    for (int i = 0; i < proposers.size(); i++) {
+    deque<int> unmatched(players.size(), 0);
+    for (int i = 0; i < players.size(); i++) {
         unmatched[i] = i;
     }
 
     while (unmatched.size() && proposals_left(unmatched.front())) {
         int proposer_id = unmatched.front();
         unmatched.pop_front();
-        auto& proposer = proposers[proposer_id];
+        auto& proposer = players[proposer_id];
         int rejecter_id = proposer.next_proposal();
-        auto& rejecter = rejecters[rejecter_id];
+        auto& rejecter = teams[rejecter_id];
 
-        if (rejecter.partner == -1) { // No Marriage yet
-            marry(proposer_id, rejecter_id);
+        if (rejecter.partners.size() < m) { // Not enough players yet
+            join(proposer_id, rejecter_id);
         }
-        else if (preferred(proposer_id, rejecter_id)) { // Preferred Marriage
-            unmatched.push_back(rejecter.partner);
-            proposers[rejecter.partner].partner = -1;
-            marry(proposer_id, rejecter_id);
+        else if (preferred(proposer_id, rejecter_id)) { // Preferred player
+            unmatched.push_front(rejecter.partners.top().second);
+            rejecter.partners.pop();
+            join(proposer_id, rejecter_id);
         }
         else { // No match found, try again
-            unmatched.push_back(proposer_id);
+            unmatched.push_front(proposer_id);
         }
     }
 
     return unmatched.size() == 0; 
-}
-
-// Problem Specific
-
-int n, m, k;
-
-void debug_print() {
-    cout << "Proposers:\n";
-    for (int i = 0; i < n; i++) {
-        cout << i << " (" << proposers[i].partner << "): ";
-        for (auto v : proposers[i].preferences) {
-            cout << v << " "; 
-        }
-        cout << "\n";
-    }
-
-    cout << "\nRejecters:\n";
-    for (int i = 0; i < k; i++) {
-        cout << i << " (" << rejecters[i].partner << "): ";
-        for (auto v : rejecters[i].preferences_values) {
-            cout << v << " "; 
-        }
-        cout << "\n";
-    }
 }
 
 unordered_map<string, int> team_mapping;
@@ -109,17 +86,15 @@ unordered_map<string, int> player_mapping;
 vector<string> team_names;
 vector<string> player_names;
 vector<vector<string>> teams_unconverted;
-vector<vector<int>> final_drafts;
 
 int main() {
     cin >> n >> m >> k;
-    proposers.resize(n);
+    teams.resize(n);
     team_names.resize(n);
     player_names.resize(k);
-    final_drafts.resize(n);
-    rejecters.resize(k);
+    players.resize(k);
     string buf;
-    teams_unconverted.resize(k);
+    teams_unconverted.resize(n);
     for (int i = 0; i < n; i++) {
         cin >> buf; 
         team_names[i] = buf;
@@ -133,52 +108,31 @@ int main() {
         cin >> buf; 
         player_names[i] = buf;
         player_mapping[buf] = i;
-        rejecters[i].preferences_values.resize(n);
+        players[i].preferences.resize(n);
         for (int j = 0; j < n; j++){
             cin >> buf;
-            rejecters[i].preferences_values[team_mapping[buf]] = j;
+            players[i].preferences[j] = team_mapping[buf];
         }
     }
     for (int i = 0; i < n; i++) {
-        for (auto player : teams_unconverted[i]) {
-            proposers[i].preferences.push_back(player_mapping[player]);
+        teams[i].preferences_values.resize(k);
+        for (int j = 0; j < teams_unconverted[i].size(); j++) {
+            int player = player_mapping[teams_unconverted[i][j]];
+            teams[i].preferences_values[player] = j;
         }
     }
     
-    for (int i = 0; i < m; i++) {
-        stable_match();
-        unordered_set<int> drafted;
-        for(int j = 0; j < k; j++) {
-            rejecters[j].partner = -1;
-        }
-        for(int j = 0; j < n; j++) {
-            int draft_id = proposers[j].partner;
-            drafted.emplace(draft_id);
-            final_drafts[j].emplace_back(draft_id);
-        }
-        for(auto& team : proposers) {
-            team.partner = -1;
-            team.proposed_count = 0;
-            team.preferences.erase(
-                    remove_if(
-                        team.preferences.begin(), 
-                        team.preferences.end(), 
-                        [drafted](int v) { return drafted.find(v) != drafted.end(); }
-                    ),
-                team.preferences.end()
-                );
-        }
-    }
+    stable_match();
     
     for(int i = 0; i < n; i++) {
         cout << team_names[i] << " ";
-        for (int j = 0; j < m; j++) {
-            int player = final_drafts[i][j];
-            cout << player_names[player] << (j + 1 == m ? "" : " "); 
+        while(teams[i].partners.size()) {
+            int player = teams[i].partners.top().second;
+            teams[i].partners.pop();
+            cout << player_names[player] << (teams[i].partners.size() ? " " : ""); 
         }
         cout << "\n";
     }
-    
 
     return 0;
 }
