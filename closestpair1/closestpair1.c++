@@ -3,6 +3,7 @@
 #include <utility>
 #include <cmath>
 #include <iterator>
+#include <iomanip>
 
 using namespace std;
 
@@ -61,8 +62,8 @@ Result closestpair(int start, int end){
         points.begin() + start, 
         points.begin() + end, 
         back_inserter(points_y), 
-        [&](Point p){return abs(p.first - line_x) <= min_distance.distance;});
-    sort(points_y.begin(), points_y.end(), [](Point p1, Point p2) {return p1.second < p2.second;});
+        [&](const auto& p){return abs(p.first - line_x) <= min_distance.distance;});
+    sort(points_y.begin(), points_y.end(), [](const auto& p1, const auto& p2) {return p1.second < p2.second;});
     int py = points_y.size();
     for(int i = 0; i < py; i++) {
         for(int j = i + 1; j < py && j < i + 8; j++) {
@@ -75,6 +76,7 @@ Result closestpair(int start, int end){
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
+    cout << std::fixed << setprecision(2);
     while (true) {
         cin >> n;   
         if (n == 0) break;
@@ -84,7 +86,7 @@ int main() {
         }
         sort(points.begin(), points.end());
         Result result = closestpair(0, n);
-        cout << result.p1_x << " "<< result.p1_y << " "<< result.p2_x << " "<< result.p2_y << "\n";
+        cout  << result.p1_x << " "<< result.p1_y << " "<< result.p2_x << " "<< result.p2_y << "\n";
     }
     
 }
