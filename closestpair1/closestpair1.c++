@@ -4,12 +4,12 @@
 #include <cmath>
 #include <iterator>
 #include <iomanip>
+#include <execution>
 
 using namespace std;
 
 typedef pair<double, double> Point;
 
-int n;
 vector<Point> points;
 
 struct Result {
@@ -33,7 +33,7 @@ const inline Result distance_y(vector<Point>& points_y, int _p1, int _p2) {
     return r;
 }
 
-const inline Result distance_x(int _p1, int _p2) {
+const inline Result distance_x(vector<Point>& points, int _p1, int _p2) {
     double x = points[_p1].first - points[_p2].first; 
     double y = points[_p1].second - points[_p2].second; 
     Result r = {
@@ -49,10 +49,10 @@ const inline Result distance_x(int _p1, int _p2) {
 Result closestpair(int start, int end){
     int length = end - start;
     if (length == 2) {
-        return distance_x(start, start + 1);
+        return distance_x(points, start, start + 1);
     }
     if (length == 3) {
-        return min({distance_x(start, start + 1), distance_x(start, start + 2), distance_x(start + 1, start + 2)});
+        return min({distance_x(points, start, start + 1), distance_x(points, start, start + 2), distance_x(points, start + 1, start + 2)});
     }
     int mid = start + (length / 2);
     Result min_distance = min(closestpair(start, mid), closestpair(mid, end));
@@ -73,20 +73,38 @@ Result closestpair(int start, int end){
     return min_distance;
 }
 
+Result test_case(pair<int, int> c) {
+    return closestpair(c.first, c.second);
+}
+
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout << std::fixed << setprecision(2);
+    vector<pair<int, int>> cases;
+    int last = 0;
     while (true) {
+        int n;
         cin >> n;   
         if (n == 0) break;
-        points.resize(n);
+        points.resize(points.size() + n);
         for (int i = 0; i < n; i++){
-            cin >> points[i].first >> points[i].second;
+            cin >> points[last + i].first >> points[last + i].second;
         }
-        sort(points.begin(), points.end());
-        Result result = closestpair(0, n);
+        sort(points.begin() + last, points.begin() + last + n);
+        cases.emplace_back(last, last + n);
+        last += n;
+    }
+    vector<Result> results;
+    auto k = transform(
+        execution::par_unseq, 
+        cases.begin(), 
+        cases.end(), 
+        results.begin(),
+        test_case
+    );
+    for (auto [start, end] : cases) {
+        Result result = closestpair(start, end);
         cout  << result.p1_x << " "<< result.p1_y << " "<< result.p2_x << " "<< result.p2_y << "\n";
     }
-    
 }
