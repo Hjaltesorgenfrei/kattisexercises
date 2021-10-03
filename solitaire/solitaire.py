@@ -1,3 +1,14 @@
+def print_state(s):
+    for y in range(5):
+        for x in range(9):
+            if position_valid((x, y)):
+                print('o' if (x, y) in s else '.', end="")
+            else: 
+                print('#', end="")
+        print()
+    print()
+
+
 def position_valid(*p):
     x, y = p[0]
     if (y == 0 or y == 4) and (x < 3 or x > 5): #Holes
@@ -9,7 +20,7 @@ def get_moves(pegs):
     for x, y in pegs:
         moves = [((x-2, y), (x-1, y)), ((x+2, y), (x+1, y)), ((x, y-2), (x, y-1)), ((x, y+2), (x, y+1))]
         for landing, jumped in moves:
-            if position_valid(landing) and jumped in pegs:
+            if position_valid(landing) and jumped in pegs and landing not in pegs:
                 move = list(pegs)
                 move.remove((x, y))
                 move.remove(jumped)
@@ -28,6 +39,7 @@ def solve(pegs):
         if move not in solved:
             solved[move] = solve(move)
         mi = min(solved[move], mi)
+        if mi == 1: return 1
     return mi
 
 cases = int(input())
