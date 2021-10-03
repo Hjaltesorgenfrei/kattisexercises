@@ -6,8 +6,7 @@ def position_valid(*p):
 
 def get_moves(pegs):
     possible_moves = []
-    for p in pegs:
-        x, y = p
+    for x, y in pegs:
         moves = [((x-2, y), (x-1, y)), ((x+2, y), (x+1, y)), ((x, y-2), (x, y-1)), ((x, y+2), (x, y+1))]
         for landing, jumped in moves:
             if position_valid(landing) and jumped in pegs:
