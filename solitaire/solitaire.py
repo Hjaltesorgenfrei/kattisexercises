@@ -23,13 +23,11 @@ solved = {}
 def solve(pegs):
     possible = get_moves(pegs)
     if len(possible) == 0:
-        return (len(pegs), 0)
-    mi = (10000, 100000)
+        return len(pegs)
+    mi = 10000
     for move in possible:
         if move not in solved:
-            pegs_used, moves = solve(move)
-            moves += 1
-            solved[move] = (pegs_used, moves)
+            solved[move] = solve(move)
         mi = min(solved[move], mi)
     return mi
 
@@ -41,8 +39,8 @@ for n in range(cases):
         for x, c in enumerate(line):
             if c == 'o':
                 pegs.append((x, y))
-    
-    if n + 1 == cases:
-        input()
 
-    print(*solve(tuple(pegs)))
+    if n + 1 != cases:
+        input()
+    sol = solve(tuple(pegs))
+    print(f"{sol} {len(pegs) - sol}")
