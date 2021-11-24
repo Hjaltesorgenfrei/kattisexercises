@@ -35,7 +35,6 @@ COMPLEX_OPS(/)
 using namespace std;
 using namespace std::complex_literals;
 
-int t;
 typedef complex<double> Complex;
 typedef std::valarray<Complex> CArray;
 
@@ -76,16 +75,17 @@ void testCase() {
     cin >> n1;
     n1++;
     vector<int> av(n1);
-    for (int i = 0; i < n1; i++)
+    for (int i = 0; i < n1; i++) {
         cin >> av[i];
+    }
     cin >> n2;
     n2++;
-    vector<int> bv(n1);
+    vector<int> bv(n2);
     for (int i = 0; i < n2; i++) {
         cin >> bv[i];
     }
-    int n = n1 + n2 - 1;
-    n = pow(2, ceil(log(n) / log(2)));
+
+    int n = pow(2, ceil(log(n1 + n2 - 1) / log(2)));
     CArray a(n);
     for (int i = 0; i < n1; i++) {
         a[i] = Complex(av[i]);
@@ -94,6 +94,7 @@ void testCase() {
     for (int i = 0; i < n2; i++) {
         b[i] = Complex(bv[i]);
     }
+
     auto c = polymul(a, b);
     cout << n1 + n2 - 2 << "\n";
     for (int i = 0; i < n1 + n2 - 1; i++) {
@@ -106,8 +107,9 @@ int main() {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);
-    cin >> t;
-    for (int _ = 0; _ < t; _++) {
+    int cases;
+    cin >> cases;
+    while (cases--) {
         testCase();
     }
     return 0;
