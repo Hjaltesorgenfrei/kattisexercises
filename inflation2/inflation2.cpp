@@ -27,10 +27,12 @@ int main() {
         if(cin.get() == 'S') {
             cin.ignore(3);
             cin >> a >> b;
-            int count = m[a - inflation];
-            m[a - inflation] = 0;
-            m[b - inflation] += count;
-            sum += (b - a) * count;
+            if (a != b) {
+                int count = m[a - inflation];
+                m[a - inflation] = 0;
+                m[b - inflation] += count;
+                sum += (b - a) * count;
+            }
         }
         else {
             cin.ignore(9);
