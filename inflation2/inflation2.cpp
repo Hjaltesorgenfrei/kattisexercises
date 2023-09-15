@@ -21,7 +21,7 @@ int main() {
     }
     LL inflation = 0;
     cin >> q;
-    int a, b;
+    LL a, b;
     for (int i = 0; i < q; i++) {
         cin.get();
         if(cin.get() == 'S') {
